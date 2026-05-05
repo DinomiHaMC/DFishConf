@@ -22,6 +22,7 @@ bash insgit.sh
 
 Алиасы:
 - ls
+
 ls - lsd
 l - lsd -l
 la - lsd -a
@@ -30,6 +31,7 @@ lt - lsd -tree
 sl - lsd
 
 - utils
+
 mon - btop
 ff - fastfetch
 fff - fastfetch
@@ -43,11 +45,13 @@ hom - cd ~
 hm - cd ~
 
 - neovim
+
 nv - nvim
 nvf - nv ~/.config/config.fish (открыть настройки fish)
 nvn - nv ~/.config/niri/config.kdl (открыть настройки niri)
 
 - pacman
+
 pac - sudo pacman
 paci - pacman -S --noconfirm
 pacs - pacman -S
@@ -56,6 +60,7 @@ pacq - pacman -Qe
 pacu - pacman -U
 
 - yay
+
 ya - yay
 ys - yay -S
 yr - yay -R
@@ -65,14 +70,17 @@ yq - yay -Qe
 yupd - yay -Syu --noconfirm
 
 - lazyTUI
+
 lssh - lazyssh
 lg - lazygit
 ldoc - lazydocker
 
 - python
+
 py - python
 pyi - pip install --break-system-packages
 
 - zapret
+
 fix - ~/zap/service.sh service start
 fixs - ~/zap/service.sh service stop
