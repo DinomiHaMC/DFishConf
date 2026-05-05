@@ -7,7 +7,7 @@
 ```
 cd ~/ && curl -LJO https://raw.githubusercontent.com/DinomiHaMC/DFishConf/refs/heads/main/ins.sh && bash ins.sh
 ```
-
+\n
 
 Через Git:
 ```
@@ -19,15 +19,15 @@ bash gitins.sh
 ```
 
 После скачивания советую перезагрузится: ```reboot```
-
+\n
 
 Что же я скачал кроме ратника?
 
 Вместо bash будет стоять более красивый fish (я забыл как называется тема)
-
+\n
 
 Новые программы которые описаны в алиасах ниже
-
+\n
 
 Алиасы:
 - ls
