@@ -2,7 +2,7 @@
 
 Скачать через cUrl: 
 ```
-curl -LJO https://raw.githubusercontent.com/DinomiHaMC/DFishConf/refs/heads/main/ins.sh | bash
+cd ~/ && curl -LJO https://raw.githubusercontent.com/DinomiHaMC/DFishConf/refs/heads/main/ins.sh | bash
 ```
 
 Через Git:
