@@ -1,6 +1,9 @@
 # DinoMiHa`s Fish Config
 
-Скачать через cUrl: ```curl -LJO https://raw.githubusercontent.com/DinomiHaMC/DFishConf/refs/heads/main/ins.sh | bash```
+Скачать через cUrl: 
+```
+curl -LJO https://raw.githubusercontent.com/DinomiHaMC/DFishConf/refs/heads/main/ins.sh | bash
+```
 
 Через Git:
 ```
