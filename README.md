@@ -13,7 +13,7 @@ cd ~/
 git clone https://github.com/DinomiHaMC/DFishConf.git
 mv DFishConf DFishC
 cd ~/DFishC
-bash insgit.sh
+bash gitins.sh
 ```
 
 
