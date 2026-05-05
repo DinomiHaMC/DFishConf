@@ -1,6 +1,8 @@
 # DinoMiHa`s Fish Config
 
 
+Работает на дистрибутивах linux arch / arch-based
+
 Скачать через cUrl: 
 ```
 cd ~/ && curl -LJO https://raw.githubusercontent.com/DinomiHaMC/DFishConf/refs/heads/main/ins.sh && bash ins.sh
