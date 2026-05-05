@@ -1,3 +1,5 @@
+#!/bin/bash
+
 cd ~/
 # Скачиваем yay - установщик++
 sudo pacman -S --noconfirm --needed git base-devel
@@ -24,7 +26,8 @@ git clone https://github.com/LazyVim/starter ~/.config/nvim
 rm -rf ~/.config/nvim/.git
 
 # Установка настроек на fish
-
+git clone https://github.com/DinomiHaMC/DFishConf.git
+mv DFishConf DFishC
 cd ~/DFishC
 cp -r fish ~/.config
 cp -r fastfetch ~/.config
