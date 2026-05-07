@@ -5,18 +5,14 @@
 
 ### Скачать через cUrl: 
 ```
-cd ~/ && curl -LJO https://raw.githubusercontent.com/DinomiHaMC/DFishConf/refs/heads/main/ins.sh && bash ins.sh
+curl -LJO https://raw.githubusercontent.com/DinomiHaMC/DFishConf/refs/heads/main/ins.sh && bash ins.sh
 ```
 
 
 
 ### Через Git:
 ```
-cd ~/
-git clone https://github.com/DinomiHaMC/DFishConf.git
-mv DFishConf DFishC
-cd ~/DFishC
-bash gitins.sh
+git clone https://github.com/DinomiHaMC/DFishConf.git ~/DFishC && bash ~/DFishC/ins.sh
 ```
 
 После скачивания советую перезагрузится: ```reboot```
@@ -68,6 +64,8 @@ dc - cd
 hom - cd ~
 
 hm - cd ~
+
+occ - openclaude (сам не скачивается, работает если в ~/openclaude)
 
 -----------------------
 - neovim
@@ -132,3 +130,9 @@ pyi - pip install --break-system-packages
 fix - ~/zap/service.sh service start
 
 fixs - ~/zap/service.sh service stop
+
+-----------------------
+- ffinder
+
+\\ <ЗАПРОС В GOOGLE>
+Создает окно firefox с вашим запросом
