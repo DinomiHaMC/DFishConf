@@ -57,7 +57,12 @@ if status is-interactive
     alias pyi='pip install --break-system-packages'
 
     #openclaude
-    alias occ="bun run --cwd=/home/dmh/openclaude dev:openai"
+    alias occ="/home/dmh/openclaude/bin/openclaude"
+
+    #ffinder
+    function \\
+        nohup firefox --new-window "https://www.google.com/search?q=$argv" >/dev/null
+    end
 
     #setup
     zoxide init fish | source
@@ -65,6 +70,11 @@ if status is-interactive
     #zapret
     alias fix='~/zap/service.sh service start'
     alias fixs='~/zap/service.sh service stop'
+
+    export CLAUDE_CODE_USE_OPENAI=1
+    export OPENAI_API_KEY=sk-zxc
+    export OPENAI_BASE_URL=http://192.168.1.74:5001/
+    export OPENAI_MODEL=gpt-4o
 
     ff
 end
