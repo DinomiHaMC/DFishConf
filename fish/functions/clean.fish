@@ -1,0 +1,1 @@
+../../../hobbyist-dotfiles/Configs/fish/functions/clean.fish
