@@ -1,5 +1,5 @@
 if status is-interactive
-    set TERM xterm-256-color
+    set TERM xterm-256color
 
     #ls
     alias ls='lsd'
