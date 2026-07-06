@@ -1,7 +1,7 @@
 # DinoMiHa`s Fish Config
 
 
-### Работает на дистрибутивах linux arch / arch-based
+### Работает на Arch/Arch-based и Debian/Ubuntu-based дистрибутивах Linux
 
 ### Скачать через cUrl: 
 ```
@@ -77,22 +77,28 @@ nvf - nv ~/.config/config.fish (открыть настройки fish)
 nvn - nv ~/.config/niri/config.kdl (открыть настройки niri)
 
 -----------------------
-- pacman
+- packages
 
-pac - sudo pacman
+На Arch/Arch-based алиасы используют `pacman`, на Debian/Ubuntu-based - `apt`.
 
-paci - pacman -S --noconfirm
+pac - sudo pacman / sudo apt
 
-pacs - pacman -S
+paci - pacman -S --noconfirm / apt install -y
 
-pacr - pacman -R
+pacs - pacman -S / apt install
 
-pacq - pacman -Qe
+pacr - pacman -R / apt remove
+
+pacq - pacman -Qe / apt list --installed
 
 pacu - pacman -U
 
+pacupd - pacman -Syu / apt update && apt upgrade -y
+
 -----------------------
 - yay
+
+Работает только если установлен `yay`.
 
 ya - yay
 
