@@ -55,7 +55,7 @@ lgit - lazygit
 
 sf - spf
 
-cat - bat
+bt - bat / batcat
 
 home - cd ~
 
@@ -65,16 +65,39 @@ hom - cd ~
 
 hm - cd ~
 
+rm - rm -rf
+
+mk - mkdir
+
+md - mkdir
+
 occ - openclaude (сам не скачивается, работает если в ~/openclaude)
+
+-----------------------
+- git
+
+gc - git clone
+
+ga - git add
+
+gal - git add *
+
+gcm - git commit -m
+
+gp - git push
+
+gin - git init
 
 -----------------------
 - neovim
 
 nv - nvim
 
-nvf - nv ~/.config/config.fish (открыть настройки fish)
+nvf - nv ~/.config/fish/config.fish (открыть настройки fish)
 
 nvn - nv ~/.config/niri/config.kdl (открыть настройки niri)
+
+snv - sudo nvim
 
 -----------------------
 - packages
@@ -94,6 +117,25 @@ pacq - pacman -Qe / apt list --installed
 pacu - pacman -U
 
 pacupd - pacman -Syu / apt update && apt upgrade -y
+
+ai - sudo apt install -y
+
+as - sudo apt install
+
+ar - sudo apt remove
+
+aq - apt list --installed
+
+au - sudo apt update && sudo apt upgrade -y
+
+-----------------------
+- flatpak
+
+fp - flatpak
+
+fpi - flatpak install
+
+fpr - flatpak remove
 
 -----------------------
 - yay
@@ -130,12 +172,19 @@ py - python
 
 pyi - pip install --break-system-packages
 
+pyir - pip install --break-system-packages -r requirements.txt
+
 -----------------------
 - zapret
 
-fix - ~/zap/service.sh service start
+fix - zap/service.sh run -s "general (ALT).bat"
 
-fixs - ~/zap/service.sh service stop
+-----------------------
+- system
+
+shn - shutdown now
+
+rbt - reboot
 
 -----------------------
 - ffinder
