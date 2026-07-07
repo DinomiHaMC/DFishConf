@@ -1,5 +1,7 @@
 if status is-interactive
-    set TERM xterm-256color
+    export TERM=xterm-258color
+
+    alias kit='TERM=xterm-kitty'
 
     #ls
     alias ls='lsd'
@@ -14,7 +16,6 @@ if status is-interactive
     alias ff='fastfetch'
     alias fff='ff'
     alias f='ff'
-    alias lgit='lazygit'
     alias sf='spf'
     if command -q bat
         alias bt='bat'
@@ -38,10 +39,10 @@ if status is-interactive
     alias gin='git init'
 
     #neovim
-    alias nv='nvim'
+    alias nv='kit nvim'
     alias nvf='nv ~/.config/fish/config.fish'
     alias nvn='nv ~/.config/niri/config.kdl'
-    alias snv='sudo nvim'
+    alias snv='kit sudo nvim'
 
     #packages
     if command -q pacman
@@ -84,9 +85,9 @@ if status is-interactive
     end
 
     #lazyTUI
-    alias lssh='lazyssh'
-    alias lg='lazygit'
-    alias ldoc='lazydocker'
+    alias lssh='kit lazyssh'
+    alias lg='kit lazygit'
+    alias ldoc='kit lazydocker'
 
     #python
     if command -q python
