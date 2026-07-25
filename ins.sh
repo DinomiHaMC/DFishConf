@@ -26,6 +26,11 @@ detect_distro_family() {
     source /etc/os-release
     local ids=" ${ID:-} ${ID_LIKE:-} "
 
+    if [[ "${ID:-}" == "nixos" ]]; then
+      DISTRO_FAMILY="nixos"
+      return
+    fi
+
     if [[ "$ids" == *"arch"* ]]; then
       DISTRO_FAMILY="arch"
       return
@@ -37,12 +42,14 @@ detect_distro_family() {
     fi
   fi
 
-  if have_cmd pacman; then
+  if have_cmd nixos-rebuild; then
+    DISTRO_FAMILY="nixos"
+  elif have_cmd pacman; then
     DISTRO_FAMILY="arch"
   elif have_cmd apt; then
     DISTRO_FAMILY="debian"
   else
-    echo "Не удалось определить дистрибутив. Поддерживаются Debian/Ubuntu-based и Arch-based."
+    echo "Не удалось определить дистрибутив. Поддерживаются NixOS, Debian/Ubuntu-based и Arch-based."
     DISTRO_FAMILY="unknown"
   fi
 }
@@ -137,6 +144,47 @@ install_debian_packages() {
   echo "lazyssh, lazydocker и superfile могут отсутствовать в apt-репозиториях. Установи их вручную, если они нужны."
 }
 
+install_nixos_packages() {
+  if ! have_cmd nix; then
+    echo "nix не найден, установку пакетов пропускаю"
+    return
+  fi
+
+  if ! nix registry list | grep -q '^global flake:nixpkgs'; then
+    echo "nixpkgs не найден в registry. Если установка не сработает, настрой flakes/nixpkgs."
+  fi
+
+  local nix_packages=(
+    nixpkgs#git
+    nixpkgs#fish
+    nixpkgs#neovim
+    nixpkgs#fastfetch
+    nixpkgs#btop
+    nixpkgs#bat
+    nixpkgs#lsd
+    nixpkgs#lazygit
+    nixpkgs#openssh
+    nixpkgs#docker
+    nixpkgs#python3
+    nixpkgs#python312Packages.pip
+    nixpkgs#ntfs3g
+    nixpkgs#zoxide
+  )
+
+  for package in "${nix_packages[@]}"; do
+    nix profile install "$package" || echo "Не удалось установить $package через nix profile"
+  done
+
+  echo
+  echo "NixOS: Docker и fish лучше включить декларативно в /etc/nixos/configuration.nix:"
+  echo
+  echo "  programs.fish.enable = true;"
+  echo "  virtualisation.docker.enable = true;"
+  echo
+  echo "После изменения configuration.nix выполни:"
+  echo "  sudo nixos-rebuild switch"
+}
+
 install_packages() {
   case "$DISTRO_FAMILY" in
   arch)
@@ -144,6 +192,9 @@ install_packages() {
     ;;
   debian)
     install_debian_packages
+    ;;
+  nixos)
+    install_nixos_packages
     ;;
   *)
     echo "Тип системы не определён, установку пакетов пропускаю"
@@ -161,6 +212,10 @@ install_zapret() {
 
   if [[ "$DISTRO_FAMILY" == "unknown" ]]; then
     echo "Тип системы не определён, зависимости zapret не устанавливаю"
+  elif [[ "$DISTRO_FAMILY" == "nixos" ]]; then
+    echo "NixOS: зависимости zapret лучше добавить в configuration.nix."
+    echo "Попробую запустить download-deps, но на NixOS это может не сработать."
+    "$HOME/zap/service.sh" download-deps --default || echo "zapret download-deps не сработал на NixOS"
   else
     "$HOME/zap/service.sh" download-deps --default
   fi
@@ -217,6 +272,20 @@ install_fish_launcher() {
     return
   fi
 
+  if [[ "$DISTRO_FAMILY" == "nixos" ]]; then
+    echo "NixOS: рекомендуется включить fish декларативно:"
+    echo
+    echo "  programs.fish.enable = true;"
+    echo
+    echo "и для пользователя:"
+    echo
+    echo "  users.users.$USER.shell = pkgs.fish;"
+    echo
+    echo "После этого:"
+    echo "  sudo nixos-rebuild switch"
+    return
+  fi
+
   if ! grep -Fqx "$fish_path" /etc/shells 2>/dev/null; then
     echo "$fish_path" | sudo tee -a /etc/shells >/dev/null
   fi
@@ -237,12 +306,57 @@ install_fish_launcher() {
   fi
 }
 
+install_dsort() {
+  cp ~/DFishC/DSort.sh ~
+}
+
+show_nixos_config_hint() {
+  cat <<EOF
+
+Для полноценной настройки NixOS лучше добавить в /etc/nixos/configuration.nix:
+
+environment.systemPackages = with pkgs; [
+  git
+  fish
+  neovim
+  fastfetch
+  btop
+  bat
+  lsd
+  lazygit
+  openssh
+  docker
+  python3
+  python312Packages.pip
+  ntfs3g
+  zoxide
+];
+
+programs.fish.enable = true;
+virtualisation.docker.enable = true;
+
+users.users.$USER = {
+  extraGroups = [ "wheel" "networkmanager" "docker" "video" "audio" ];
+  shell = pkgs.fish;
+};
+
+Потом выполнить:
+
+  sudo nixos-rebuild switch
+
+EOF
+}
+
 run_auto_install() {
   install_packages
   install_zapret
   install_lazyvim
   install_configs
   install_fish_launcher no
+
+  if [[ "$DISTRO_FAMILY" == "nixos" ]]; then
+    show_nixos_config_hint
+  fi
 }
 
 run_manual_install() {
@@ -268,6 +382,14 @@ run_manual_install() {
 
   if ask_yes_no "Настроить запуск fish вместо bash?"; then
     install_fish_launcher ask
+  fi
+
+  if ask_yes_no "Установить Сортировщик (DSort.sh)?"; then
+    install_dsort
+  fi
+
+  if [[ "$DISTRO_FAMILY" == "nixos" ]] && ask_yes_no "Показать пример configuration.nix для NixOS?"; then
+    show_nixos_config_hint
   fi
 }
 
