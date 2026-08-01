@@ -1,0 +1,15 @@
+version = 1
+name = "My project"
+inherit_global = false
+
+[shell]
+default = "sh"
+
+[[groups]]
+name = "Development"
+
+[[groups.commands]]
+id = "status"
+name = "Git status"
+description = "Show working tree status"
+command = "git status"
