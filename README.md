@@ -51,6 +51,7 @@ reboot
 - установить `yay` на Arch/Arch-based системах;
 - скачать и настроить zapret в `~/zap`;
 - установить LazyVim в `~/.config/nvim`;
+- скачать FastCommanderTUI в `~/FastCommanderTUI` и установить через `cargo install --path .`;
 - скопировать `config.fish`, `fish_variables`, `fish_plugins`, `conf.d`, `completions` и `functions` в `~/.config/fish`;
 - добавить запуск `fish` вместо `bash`;
 - скопировать `DSort.sh` в домашнюю директорию;
@@ -66,7 +67,7 @@ Arch/Arch-based:
 - `lsd`, `btop`, `fastfetch`, `bat`;
 - `lazygit`, `neovim`;
 - `ntfs-3g`, `openssh`, `docker`;
-- `python`, `python-pip`;
+- `cargo`, `python`, `python-pip`;
 - через `yay`: `lazyssh`, `lazydocker`, `superfile`.
 
 Debian/Ubuntu-based:
@@ -75,7 +76,7 @@ Debian/Ubuntu-based:
 - `lsd`, `btop`, `fastfetch`, `bat`;
 - `lazygit`, `neovim`;
 - `ntfs-3g`, `openssh-client`, `openssh-server`, `docker.io`;
-- `python3`, `python3-pip`, `python-is-python3`.
+- `cargo`, `python3`, `python3-pip`, `python-is-python3`.
 
 `lazyssh`, `lazydocker` и `superfile` могут отсутствовать в apt-репозиториях. Скрипт предупредит об этом.
 
@@ -83,7 +84,7 @@ NixOS:
 
 - `git`, `fish`, `neovim`, `fastfetch`;
 - `btop`, `bat`, `lsd`, `lazygit`;
-- `openssh`, `docker`, `python3`, `pip`;
+- `openssh`, `docker`, `cargo`, `python3`, `pip`;
 - `ntfs3g`, `zoxide`.
 
 ## Конфиг fish

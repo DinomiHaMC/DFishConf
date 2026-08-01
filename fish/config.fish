@@ -6,6 +6,7 @@ fish_add_path $HOME/.nix-profile/bin
 fish_add_path /nix/var/nix/profiles/default/bin
 fish_add_path /run/current-system/sw/bin
 fish_add_path /run/wrappers/bin
+fish_add_path $HOME/.cargo/bin
 
 # Tide renders the prompt in a non-interactive fish process too.
 set -l tide_detected_os (_tide_detect_os)

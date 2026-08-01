@@ -90,6 +90,7 @@ install_arch_packages() {
     ntfs-3g
     openssh
     docker
+    cargo
     python
     python-pip
     zoxide
@@ -128,6 +129,7 @@ install_debian_packages() {
     openssh-client
     openssh-server
     docker.io
+    cargo
     python3
     python3-pip
     python-is-python3
@@ -165,6 +167,7 @@ install_nixos_packages() {
     nixpkgs#lazygit
     nixpkgs#openssh
     nixpkgs#docker
+    nixpkgs#cargo
     nixpkgs#python3
     nixpkgs#python312Packages.pip
     nixpkgs#ntfs3g
@@ -225,6 +228,24 @@ install_lazyvim() {
   rm -rf "$HOME/.config/nvim"
   git clone https://github.com/LazyVim/starter "$HOME/.config/nvim"
   rm -rf "$HOME/.config/nvim/.git"
+}
+
+install_fastcommander_tui() {
+  local project_dir="$HOME/FastCommanderTUI"
+
+  if ! have_cmd cargo; then
+    echo "cargo не найден, FastCommanderTUI установить невозможно"
+    return
+  fi
+
+  if [[ -d "$project_dir/.git" ]]; then
+    git -C "$project_dir" pull --ff-only
+  else
+    rm -rf "$project_dir"
+    git clone https://github.com/DinomiHaMC/FastCommanderTUI.git "$project_dir"
+  fi
+
+  (cd "$project_dir" && cargo install --path .)
 }
 
 ensure_config_repo() {
@@ -326,6 +347,7 @@ environment.systemPackages = with pkgs; [
   lazygit
   openssh
   docker
+  cargo
   python3
   python312Packages.pip
   ntfs3g
@@ -351,6 +373,7 @@ run_auto_install() {
   install_packages
   install_zapret
   install_lazyvim
+  install_fastcommander_tui
   install_configs
   install_fish_launcher no
 
@@ -374,6 +397,10 @@ run_manual_install() {
 
   if ask_yes_no "Установить LazyVim?"; then
     install_lazyvim
+  fi
+
+  if ask_yes_no "Скачать и установить FastCommanderTUI?"; then
+    install_fastcommander_tui
   fi
 
   if ask_yes_no "Установить конфиги fish/fastfetch?"; then
