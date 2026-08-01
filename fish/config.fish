@@ -7,6 +7,14 @@ fish_add_path /nix/var/nix/profiles/default/bin
 fish_add_path /run/current-system/sw/bin
 fish_add_path /run/wrappers/bin
 
+# Tide renders the prompt in a non-interactive fish process too.
+set -l tide_detected_os (_tide_detect_os)
+if test (count $tide_detected_os) -eq 3
+    set -g tide_os_icon $tide_detected_os[1]
+    set -g tide_os_color $tide_detected_os[2]
+    set -g tide_os_bg_color $tide_detected_os[3]
+end
+
 if status is-interactive
     set -gx TERM xterm-256color
 
@@ -203,4 +211,3 @@ end
 # Added by LM Studio CLI (lms)
 set -gx PATH $PATH /home/dmh/.lmstudio/bin
 # End of LM Studio CLI section
-

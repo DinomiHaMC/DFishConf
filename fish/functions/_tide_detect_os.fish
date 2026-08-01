@@ -12,6 +12,8 @@ function _tide_detect_os
             if test (uname -o) = Android
                 # https://developer.android.com/distribute/marketing-tools/brand-guidelines
                 printf %s\n  3DDC84 3C3F41 # fg is from above link, bg is from Android Studio default dark theme
+            else if test -e /bedrock/etc/bedrock-release
+                _tide_detect_os_linux_cases /bedrock/etc/os-release ID
             else
                 _tide_detect_os_linux_cases /etc/os-release ID ||
                     _tide_detect_os_linux_cases /etc/os-release ID_LIKE ||
@@ -36,6 +38,8 @@ function _tide_detect_os_linux_cases -a file key
             printf %s\n  FFFFFF 0D597F # from alpine logo
         case arch
             printf %s\n  1793D1 4D4D4D # from arch wiki header
+        case bedrock bedrocklinux
+            printf %s\n 𝑏 CED7CF 080808 # Bedrock has no dedicated Nerd Font glyph
         case centos
             printf %s\n  000000 D4D4D4 # https://wiki.centos.org/ArtWork/Brand/Logo, monochromatic
         case debian
