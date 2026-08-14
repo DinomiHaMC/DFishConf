@@ -7,6 +7,7 @@ fish_add_path /nix/var/nix/profiles/default/bin
 fish_add_path /run/current-system/sw/bin
 fish_add_path /run/wrappers/bin
 fish_add_path $HOME/.cargo/bin
+fish_add_path $HOME/go/bin
 
 # Tide renders the prompt in a non-interactive fish process too.
 set -l tide_detected_os (_tide_detect_os)
@@ -206,9 +207,9 @@ if status is-interactive
     alias shn='shutdown now'
     alias rbt='reboot'
 
+    alias mscw='curl wttr.in/moscow'
+
     command -q fastfetch; and fastfetch
 end
 
-# Added by LM Studio CLI (lms)
-set -gx PATH $PATH /home/dmh/.lmstudio/bin
-# End of LM Studio CLI section
+pyenv init - fish | source
