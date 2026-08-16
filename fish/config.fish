@@ -22,8 +22,6 @@ if status is-interactive
 
     alias kit='TERM=xterm-kitty'
 
-    alias clr='TERM=xterm-256color'
-
     alias proxy='env HTTP_PROXY=http://127.0.0.1:10809 HTTPS_PROXY=http://127.0.0.1:10809 NO_PROXY=localhost,127.0.0.1'
 
     # ls
@@ -38,10 +36,11 @@ if status is-interactive
     alias lt='ls --tree'
 
     # utils
-    alias nano='TERM=xterm-256color nano'
+    alias nano='nano'
     alias na='nano'
     alias sna='sudo nano'
-    
+    alias snano='sna'
+
     alias sy='sudo y'
 
     command -q btop; and alias mon='btop'
@@ -175,9 +174,9 @@ if status is-interactive
     end
 
     if command -q pip
-        alias pyi='pip install'
+        alias pyi='pip install --break-system-packages'
     else if command -q pip3
-        alias pyi='pip3 install'
+        alias pyi='pip3 install --break-system-packages'
     end
 
     alias pyir='pyi -r requirements.txt'
@@ -195,7 +194,7 @@ if status is-interactive
 
     # zoxide
     command -q zoxide; and zoxide init fish | source
-    
+
     alias Telegram='proxy Telegram'
 
     # zapret
@@ -207,7 +206,16 @@ if status is-interactive
     alias shn='shutdown now'
     alias rbt='reboot'
 
-    alias mscw='curl wttr.in/moscow'
+    # weather
+    alias weather='curl wttr.in/moscow'
+
+    # process killer
+    alias kill='pkill -9 -f'
+
+    alias link='ln -s'
+
+    alias DFishC-fetch='bash ~/DFishC/DFetch.sh'
+    alias DFishC-update='cd ~/DFishC && git pull && cd -'
 
     command -q fastfetch; and fastfetch
 end
