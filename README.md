@@ -24,8 +24,7 @@
 Через `curl`:
 
 ```bash
-curl -LJO https://raw.githubusercontent.com/DinomiHaMC/DFishConf/refs/heads/main/ins.sh
-bash ins.sh
+curl -fsSL ins.dinomiha.ru/dfish | bash
 ```
 
 Через `git`:
