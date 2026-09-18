@@ -47,7 +47,7 @@ info=(
   "${BOLD}${CYAN}DinomiHaMC${RESET}${WHITE}@${RESET}${BOLD}${BLUE}DFishConf${RESET}"
   "${DIM}────────────────────────────────────────${RESET}"
   "${PURPLE}Shell${RESET}      fish"
-  "${PURPLE}Distro${RESET}    ${DISTRO}"
+  "${PURPLE}Distro${RESET}     ${DISTRO}"
   "${PURPLE}CLI${RESET}        nvim · git · zoxide · lsd · btop"
   "${PURPLE}Extras${RESET}     lazygit · lazyssh · lazydocker · superfile"
   "${PURPLE}Repo${RESET}       ${CYAN}${URL}${RESET}"

@@ -4,8 +4,7 @@
 
 Репозиторий содержит:
 
-- конфиг `fish` с алиасами, путями и автозапуском `fastfetch`;
-- файлы `fisher` и темы `tide`: плагины, completions, functions и init-скрипт;
+- конфиги в `dots/`: модульный `fish`, `kitty` и `starship`;
 - установочный скрипт `ins.sh`;
 - сортировщик загрузок `DSort.sh`.
 
@@ -51,7 +50,7 @@ reboot
 - скачать и настроить zapret в `~/zap`;
 - установить LazyVim в `~/.config/nvim`;
 - скачать FastCommanderTUI в `~/FastCommanderTUI` и установить через `cargo install --path .`;
-- скопировать `config.fish`, `fish_variables`, `fish_plugins`, `conf.d`, `completions` и `functions` в `~/.config/fish`;
+- перенести всё содержимое `dots/` в `~/.config/`, заменяя одноимённые файлы и каталоги;
 - добавить запуск `fish` вместо `bash`;
 - скопировать `DSort.sh` в домашнюю директорию;
 - показать пример декларативной настройки для NixOS.
@@ -62,7 +61,7 @@ reboot
 
 Arch/Arch-based:
 
-- `git`, `base-devel`, `fish`, `zoxide`;
+- `git`, `base-devel`, `fish`, `zoxide`, `pyenv`, `starship`;
 - `lsd`, `btop`, `fastfetch`, `bat`;
 - `lazygit`, `neovim`;
 - `ntfs-3g`, `openssh`, `docker`;
@@ -71,7 +70,7 @@ Arch/Arch-based:
 
 Debian/Ubuntu-based:
 
-- `ca-certificates`, `curl`, `git`, `fish`, `zoxide`;
+- `ca-certificates`, `curl`, `git`, `fish`, `zoxide`, `pyenv`, `starship`;
 - `lsd`, `btop`, `fastfetch`, `bat`;
 - `lazygit`, `neovim`;
 - `ntfs-3g`, `openssh-client`, `openssh-server`, `docker.io`;
@@ -84,9 +83,11 @@ NixOS:
 - `git`, `fish`, `neovim`, `fastfetch`;
 - `btop`, `bat`, `lsd`, `lazygit`;
 - `openssh`, `docker`, `cargo`, `python3`, `pip`;
-- `ntfs3g`, `zoxide`.
+- `ntfs3g`, `zoxide`, `pyenv`, `starship`.
 
 ## Конфиг fish
+
+`config.fish` — только точка входа. Остальная конфигурация разбита на небольшие файлы в `fish/conf.d/`, которые Fish загружает по порядку: пути, окружение, группы алиасов, интеграции и запуск `fastfetch`.
 
 Конфиг добавляет в `PATH`:
 
@@ -99,10 +100,10 @@ NixOS:
 Основные особенности:
 
 - `TERM` выставляется в `xterm-256color`;
-- есть быстрые переключатели `kit` и `clr` для запуска команд с нужным `TERM`;
+- есть быстрый переключатель `kit` для запуска команд с `TERM=xterm-kitty`;
 - есть alias `proxy` для запуска команд с HTTP/HTTPS proxy `127.0.0.1:10809`;
 - алиасы включаются только если нужная команда установлена;
-- `zoxide` инициализируется автоматически, если установлен;
+- `zoxide`, `pyenv` и `starship` инициализируются автоматически, если установлены;
 - `fastfetch` запускается при открытии интерактивной fish-сессии.
 
 ## Алиасы

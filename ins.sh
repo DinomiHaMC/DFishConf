@@ -95,7 +95,8 @@ install_arch_packages() {
 		python-pip
 		zoxide
 		fish
-		cargo
+		pyenv
+		starship
 	)
 
 	local yay_packages=(
@@ -136,6 +137,8 @@ install_debian_packages() {
 		python-is-python3
 		zoxide
 		fish
+		pyenv
+		starship
 	)
 
 	sudo apt update
@@ -173,6 +176,8 @@ install_nixos_packages() {
 		nixpkgs#python312Packages.pip
 		nixpkgs#ntfs3g
 		nixpkgs#zoxide
+		nixpkgs#pyenv
+		nixpkgs#starship
 	)
 
 	for package in "${nix_packages[@]}"; do
@@ -250,11 +255,11 @@ install_fastcommander_tui() {
 }
 
 ensure_config_repo() {
-	if [[ -d "$CONFIG_REPO/fish" ]]; then
+	if [[ -d "$CONFIG_REPO/dots" ]]; then
 		return
 	fi
 
-	if [[ -d "$HOME/DFishC/fish" ]]; then
+	if [[ -d "$HOME/DFishC/dots" ]]; then
 		CONFIG_REPO="$HOME/DFishC"
 		return
 	fi
@@ -265,28 +270,20 @@ ensure_config_repo() {
 
 install_configs() {
 	ensure_config_repo
+	local dots_dir="$CONFIG_REPO/dots"
+	local source target
 
-	mkdir -p "$HOME/.config/fish"
-	rm -rf "$HOME/.config/fish/conf.d" \
-		"$HOME/.config/fish/completions" \
-		"$HOME/.config/fish/functions"
-
-	for item in config.fish fish_variables fish_plugins conf.d completions functions; do
-		if [[ -e "$CONFIG_REPO/fish/$item" ]]; then
-			rm -rf "$HOME/.config/fish/$item"
-			cp -a "$CONFIG_REPO/fish/$item" "$HOME/.config/fish/"
-		fi
-	done
-
-	if [[ -d "$CONFIG_REPO/fastfetch" ]]; then
-		rm -rf "$HOME/.config/fastfetch"
-		cp -a "$CONFIG_REPO/fastfetch" "$HOME/.config/"
+	if [[ ! -d "$dots_dir" ]]; then
+		echo "Каталог dots не найден: $dots_dir"
+		return 1
 	fi
 
-	if [[ -d "$CONFIG_REPO/kitty" ]]; then
-		rm -rf "$HOME/.config/kitty"
-		cp -a "$CONFIG_REPO/kitty" "$HOME/.config/"
-	fi
+	mkdir -p "$HOME/.config"
+	while IFS= read -r -d '' source; do
+		target="$HOME/.config/$(basename -- "$source")"
+		rm -rf -- "$target"
+		cp -a -- "$source" "$target"
+	done < <(find "$dots_dir" -mindepth 1 -maxdepth 1 -print0)
 }
 
 install_fish_launcher() {
@@ -358,6 +355,8 @@ environment.systemPackages = with pkgs; [
   python312Packages.pip
   ntfs3g
   zoxide
+  pyenv
+  starship
 ];
 
 programs.fish.enable = true;
@@ -409,7 +408,7 @@ run_manual_install() {
 		install_fastcommander_tui
 	fi
 
-	if ask_yes_no "Установить конфиги fish/fastfetch/kitty?"; then
+	if ask_yes_no "Установить все конфиги из dots в ~/.config?"; then
 		install_configs
 	fi
 
