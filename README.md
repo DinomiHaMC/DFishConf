@@ -20,6 +20,11 @@
 
 ## Установка
 
+Одной командой: 
+```bash
+curl -fsSL https://ins.dinomiha.ru/dfish | bash
+```
+
 Через `curl` (рекомендуемый вариант — сначала скачать и проверить файл):
 
 ```bash
@@ -29,8 +34,6 @@ less dfishc-ins.sh
 bash dfishc-ins.sh
 rm dfishc-ins.sh
 ```
-
-Одной командой: `curl -fsSL https://ins.dinomiha.ru/dfish | bash` 
 
 Через `git`:
 
