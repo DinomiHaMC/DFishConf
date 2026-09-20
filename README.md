@@ -1,23 +1,35 @@
-# DFishC
+<h1 align="center">DFishC</h1>
 
-Мой набор настроек для `fish` и быстрый установщик рабочего окружения под Linux.
+<p align="center">
+  A practical, modular <a href="https://fishshell.com/">Fish</a> setup and an interactive Linux workstation bootstrapper.
+</p>
 
-Репозиторий содержит:
+<p align="center">
+  <a href="README.ru.md">Русский</a> ·
+  <a href="#quick-start">Quick start</a> ·
+  <a href="#what-is-included">What is included</a> ·
+  <a href="#safety-and-behaviour">Safety</a>
+</p>
 
-- конфиги в `dots/`: модульный `fish`, `kitty` и `starship`;
-- установочный скрипт `ins.sh`;
-- сортировщик загрузок `DSort.sh`.
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0--or--later-blue.svg" alt="GPL-3.0-or-later license"></a>
+  <img src="https://img.shields.io/badge/platform-Linux-1793d1.svg" alt="Linux">
+  <img src="https://img.shields.io/badge/shell-Fish-34c534.svg" alt="Fish shell">
+</p>
 
-## Поддерживаемые системы
+> [!WARNING]
+> The installer can install packages, change the login shell, and replace configuration files. Read it before running it, choose the manual mode when in doubt, and keep backups of anything important.
 
-`ins.sh` умеет определять и обслуживать:
+## Quick start
 
-- Arch/Arch-based дистрибутивы через `pacman` и, при необходимости, `yay`;
-- Debian/Ubuntu-based дистрибутивы через `apt`;
-- NixOS через `nix profile install` и подсказки для `configuration.nix`.
+Clone the repository and run the interactive installer:
 
-Если система не определена, скрипт предложит продолжить без distro-specific установки пакетов.
+```bash
+git clone https://github.com/DinomiHaMC/DFishConf.git ~/DFishC
+bash ~/DFishC/ins.sh
+```
 
+<<<<<<< HEAD
 ## Установка
 
 Одной командой: 
@@ -26,6 +38,9 @@ curl -fsSL https://ins.dinomiha.ru/dfish | bash
 ```
 
 Через `curl` (рекомендуемый вариант — сначала скачать и проверить файл):
+=======
+Or download the installer first, inspect it, then execute it:
+>>>>>>> 6ff04fa (README update)
 
 ```bash
 curl -fsSL https://ins.dinomiha.ru/dfish -o dfishc-ins.sh
@@ -35,305 +50,115 @@ bash dfishc-ins.sh
 rm dfishc-ins.sh
 ```
 
+<<<<<<< HEAD
 Через `git`:
+=======
+Always use the explicit `https://` URL. A streamed `curl | bash` invocation is supported, but downloading the file is safer: you can review it and a failed download is not masked by a pipeline exit status.
+
+The installer is interactive. It accepts `y`/`yes` and `д`/`да`; an empty reply means “no”. Log out and back in after changing the shell.
+
+## What is included
+
+| Component | Purpose |
+| --- | --- |
+| `dots/fish/` | Modular Fish configuration, functions, integrations, and conditional aliases. |
+| `dots/kitty/` | Kitty terminal configuration and colour theme. |
+| `dots/starship.toml` | Starship prompt configuration. |
+| `ins.sh` | Interactive installer for packages, configs, Fish, and optional tools. |
+| `DFetch.sh` | A compact Fish/DFishC system summary. |
+| `DSort.sh` | Sorts `~/Downloads` into media, code, and document directories. |
+
+The Fish configuration is intentionally split by responsibility: paths, environment, terminal aliases, utilities, editors, package managers, Python, integrations, and startup. Files in `conf.d/` load in lexical order.
+
+## Platform support
+
+| System | Package source | Notes |
+| --- | --- | --- |
+| Arch Linux and derivatives | `pacman`, optionally `yay` | Installs `yay` if requested and unavailable. |
+| Debian and Ubuntu derivatives | `apt` | Some optional TUI packages may need manual installation. |
+| NixOS | `nix profile` | The installer also prints a declarative `configuration.nix` example. |
+
+An unrecognised system can continue without distribution-specific package installation.
+
+## Safety and behaviour
+
+In automatic mode, `ins.sh` can install the base terminal toolkit, zapret, LazyVim, FastCommanderTUI, configuration files, and Fish startup integration. Manual mode asks before every component.
+
+External source projects that execute during installation are pinned to specific commits. Existing config and script targets are moved to:
+
+```text
+~/.local/state/dfishc/backups/<timestamp>/
+```
+
+LazyVim is fetched into a temporary directory and only replaces `~/.config/nvim` after the download is verified. The configuration content is copied into `~/.config/`; it does not symlink the repository.
+
+### Installed toolkit
+
+The exact list varies by platform, but includes Fish, Git, Neovim, Starship, Zoxide, Fastfetch, LSD, Btop, Bat, Lazygit, Python, Cargo, OpenSSH, Docker, and NTFS support. Arch systems additionally attempt `lazyssh`, `lazydocker`, and `superfile` through the AUR.
+
+> [!NOTE]
+> On NixOS, enable Fish, Docker, and the user shell declaratively in `/etc/nixos/configuration.nix`; the installer prints the required snippet.
+
+## Fish experience
+
+DFishC adds practical paths for local binaries, Nix profiles, Cargo, and Go. It initializes Zoxide, Pyenv, and Starship when present, and starts Fastfetch only in interactive shells.
+
+DFishC preserves the terminal's `TERM` value, so `nano` is neither wrapped nor given a custom terminal type: running `nano` uses the normal command and environment. Use `kit <command>` only for programs that specifically need Kitty terminal capabilities.
+
+### Selected commands
+
+| Command | Action |
+| --- | --- |
+| `na`, `sna` | Open Nano, or Nano through `sudo`. |
+| `nv`, `snv` | Open Neovim with Kitty capabilities, normally or through `sudo`. |
+| `ff`, `mon`, `bt` | Run Fastfetch, Btop, and Bat/Batcat when installed. |
+| `l`, `la`, `lla`, `lt` | Useful `ls` views; uses LSD when available. |
+| `gc`, `ga`, `gcm`, `gp` | Git clone, add, commit, and push shortcuts. |
+| `ai`/`au`, `pacs`/`pacupd`, `ys`/`yupd` | Apt, Pacman, and Yay shortcuts, defined only when available. |
+| `proxy <command>` | Run a command with local HTTP/HTTPS proxy variables. |
+| `DFishC-fetch`, `DFishC-update` | Run the bundled summary or update a clone in `~/DFishC`. |
+
+Run `alias` in Fish to see the aliases available on your machine. Commands that depend on an installed program are created conditionally.
+
+### Functions
+
+| Function | Action |
+| --- | --- |
+| `ffinder <query>` | Opens a Google search in a new Firefox window. |
+| `n [path]` | Opens Nautilus in the current directory or at a path. |
+| `use <path-or-url>` | Opens URLs and files with an appropriate application; directories are entered. |
+| `clean` | Cleans supported package-manager caches and journal logs. Review its implementation before running: it removes data. |
+
+## Download sorter
+
+`DSort.sh` creates `~/Audios`, `~/Pictures`, `~/Videos`, `~/Code`, and `~/Docs` when needed, then moves files from `~/Downloads` by extension. Files not matching a known media or code extension go to `~/Docs`.
+>>>>>>> 6ff04fa (README update)
 
 ```bash
-git clone https://github.com/DinomiHaMC/DFishConf.git ~/DFishC
-bash ~/DFishC/ins.sh
+bash ~/DSort.sh
 ```
 
-Скрипт работает интерактивно. Можно выбрать автоустановку или вручную подтвердить отдельные шаги.
-Подтверждением считаются только `y`, `yes`, `д` или `да`; пустой ответ означает отказ.
+## Updating and uninstalling
 
-После установки лучше перелогиниться или перезагрузиться:
+To update a checkout:
 
 ```bash
-reboot
+cd ~/DFishC
+git pull
+bash ins.sh
 ```
 
-## Что делает `ins.sh`
+There is no destructive one-command uninstaller. Restore the files saved under `~/.local/state/dfishc/backups/`, remove the copied directories from `~/.config/` as appropriate, and revert the Fish login-shell or `.bashrc` changes if you enabled them.
 
-В зависимости от выбранного режима скрипт может:
+## Contributing
 
-- установить базовые программы для терминала;
-- установить `yay` на Arch/Arch-based системах;
-- скачать и настроить zapret в `~/zap`;
-- установить закреплённую версию LazyVim в `~/.config/nvim`;
-- скачать FastCommanderTUI в `~/FastCommanderTUI` и установить через `cargo install --path .`;
-- перенести всё содержимое `dots/` в `~/.config/`, заменяя одноимённые файлы и каталоги;
-- добавить запуск `fish` вместо `bash`;
-- скопировать `DSort.sh` в домашнюю директорию;
-- показать пример декларативной настройки для NixOS.
+Issues and pull requests are welcome. Please keep Fish configuration modular, make aliases conditional when they rely on optional commands, and test the installer syntax before submitting changes:
 
-Перед заменой существующих конфигов и файлов скрипт переносит их в каталог
-`~/.local/state/dfishc/backups/<дата-время>/`. LazyVim сначала загружается во
-временный каталог и только после успешной проверки заменяет прежний конфиг.
-
-Версии внешних проектов, код которых выполняется во время установки (`yay`,
-zapret, FastCommanderTUI и LazyVim), закреплены в `ins.sh` по commit-хэшам. Для
-обновления такого проекта сначала проверь новую ревизию, а затем явно обнови
-соответствующую константу `*_COMMIT` в установщике.
-
-На NixOS смена shell и включение Docker лучше выполняются через `/etc/nixos/configuration.nix`, поэтому скрипт выводит готовую подсказку.
-
-## Устанавливаемые программы
-
-Arch/Arch-based:
-
-- `git`, `base-devel`, `fish`, `zoxide`, `pyenv`, `starship`;
-- `lsd`, `btop`, `fastfetch`, `bat`;
-- `lazygit`, `neovim`;
-- `ntfs-3g`, `openssh`, `docker`;
-- `cargo`, `python`, `python-pip`;
-- через `yay`: `lazyssh`, `lazydocker`, `superfile`.
-
-Debian/Ubuntu-based:
-
-- `ca-certificates`, `curl`, `git`, `fish`, `zoxide`, `pyenv`, `starship`;
-- `lsd`, `btop`, `fastfetch`, `bat`;
-- `lazygit`, `neovim`;
-- `ntfs-3g`, `openssh-client`, `openssh-server`, `docker.io`;
-- `cargo`, `python3`, `python3-pip`, `python-is-python3`.
-
-`lazyssh`, `lazydocker` и `superfile` могут отсутствовать в apt-репозиториях. Скрипт предупредит об этом.
-
-NixOS:
-
-- `git`, `fish`, `neovim`, `fastfetch`;
-- `btop`, `bat`, `lsd`, `lazygit`;
-- `openssh`, `docker`, `cargo`, `python3`, `pip`;
-- `ntfs3g`, `zoxide`, `pyenv`, `starship`.
-
-## Конфиг fish
-
-`config.fish` — только точка входа. Остальная конфигурация разбита на небольшие файлы в `fish/conf.d/`, которые Fish загружает по порядку: пути, окружение, группы алиасов, интеграции и запуск `fastfetch`.
-
-Конфиг добавляет в `PATH`:
-
-- `~/.local/bin`;
-- `~/.nix-profile/bin`;
-- `/nix/var/nix/profiles/default/bin`;
-- `/run/current-system/sw/bin`;
-- `/run/wrappers/bin`.
-
-Основные особенности:
-
-- `TERM` выставляется в `xterm-256color`;
-- есть быстрый переключатель `kit` для запуска команд с `TERM=xterm-kitty`;
-- есть alias `proxy` для запуска команд с HTTP/HTTPS proxy `127.0.0.1:10809`;
-- алиасы включаются только если нужная команда установлена;
-- `zoxide`, `pyenv` и `starship` инициализируются автоматически, если установлены;
-- `fastfetch` запускается при открытии интерактивной fish-сессии.
-
-## Алиасы
-
-### ls
-
-Если установлен `lsd`:
-
-```fish
-ls  -> lsd
-sl  -> lsd
+```bash
+bash -n ins.sh
+fish -n dots/fish/config.fish dots/fish/conf.d/*.fish dots/fish/functions/*.fish
 ```
 
-Дополнительно:
+## License
 
-```fish
-l   -> ls -l
-la  -> ls -a
-lla -> ls -la
-lt  -> ls --tree
-```
-
-### Утилиты
-
-```fish
-nano -> TERM=xterm-256color nano
-na   -> nano
-sna  -> sudo nano
-sy   -> sudo y
-mon  -> btop
-ff   -> fastfetch
-fff  -> ff
-f    -> ff
-sf   -> spf
-bt   -> bat / batcat
-home -> cd ~
-dc   -> cd
-hom  -> home
-hm   -> home
-rm   -> rm -rf
-mk   -> mkdir -p
-md   -> mkdir -p
-```
-
-### Git
-
-```fish
-gc  -> git clone
-ga  -> git add
-gal -> git add .
-gcm -> git commit -m
-gp  -> git push
-gin -> git init
-```
-
-### Neovim
-
-Если установлен `nvim`:
-
-```fish
-nv  -> TERM=xterm-kitty nvim
-nvf -> nv ~/.config/fish/config.fish
-nvn -> nv ~/.config/niri/config.kdl
-snv -> TERM=xterm-kitty sudo nvim
-```
-
-### Nix / NixOS
-
-Если установлен `nix`:
-
-```fish
-nx   -> nix
-ns   -> nix search nixpkgs
-ni   -> nix profile install nixpkgs#
-nr   -> nix profile remove
-nl   -> nix profile list
-nu   -> nix profile upgrade --all
-nd   -> nix develop
-nsh  -> nix shell nixpkgs#
-nf   -> nix flake
-nfu  -> nix flake update
-ngc  -> nix store gc
-ngcd -> nix-collect-garbage -d
-```
-
-Если доступен `nixos-rebuild`:
-
-```fish
-nrs -> sudo nixos-rebuild switch
-nrb -> sudo nixos-rebuild boot
-nrt -> sudo nixos-rebuild test
-nrc -> sudo nvim /etc/nixos/configuration.nix
-nrh -> sudo nvim /etc/nixos/hardware-configuration.nix
-```
-
-Если установлен `nh`:
-
-```fish
-nhs -> nh os switch
-nhb -> nh os boot
-nhc -> nh clean all
-```
-
-Если установлен `home-manager`:
-
-```fish
-hms -> home-manager switch
-hme -> nvim ~/.config/home-manager/home.nix
-```
-
-### Пакеты
-
-Arch/Arch-based:
-
-```fish
-pac    -> sudo pacman
-paci   -> sudo pacman -S --noconfirm
-pacs   -> sudo pacman -S
-pacr   -> sudo pacman -R
-pacq   -> pacman -Qe
-pacu   -> sudo pacman -U
-pacupd -> sudo pacman -Syu
-```
-
-Debian/Ubuntu-based:
-
-```fish
-ai   -> sudo apt install -y
-as   -> sudo apt install
-ar   -> sudo apt remove
-aq   -> apt list --installed
-au   -> sudo apt update && sudo apt upgrade -y
-apti -> sudo apt install -y
-apts -> sudo apt install
-aptr -> sudo apt remove
-aptq -> apt list --installed
-aptu -> sudo apt update && sudo apt upgrade -y
-```
-
-Flatpak:
-
-```fish
-fp  -> flatpak
-fpi -> flatpak install
-fpr -> flatpak remove
-```
-
-yay:
-
-```fish
-ya   -> yay
-ys   -> yay -S
-yr   -> yay -R
-yu   -> yay -U
-yi   -> yay -S --noconfirm
-yq   -> yay -Qe
-yupd -> yay -Syu --noconfirm
-```
-
-### Lazy TUI
-
-```fish
-lssh -> TERM=xterm-kitty lazyssh
-lg   -> TERM=xterm-kitty lazygit
-ldoc -> TERM=xterm-kitty lazydocker
-```
-
-### Python
-
-```fish
-py   -> python / python3
-pyi  -> pip install / pip3 install
-pyir -> pyi -r requirements.txt
-```
-
-### Остальное
-
-```fish
-occ      -> ~/openclaude/bin/openclaude
-Telegram -> proxy Telegram
-fix      -> ~/zap/service.sh run -s 'general (ALT).bat'
-shn      -> shutdown now
-rbt      -> reboot
-```
-
-`occ` появляется только если файл `~/openclaude/bin/openclaude` существует и исполняемый.
-
-`fix` появляется только если есть `~/zap/service.sh`.
-
-## Поиск через Firefox
-
-В fish доступна функция:
-
-```fish
-ffinder <запрос>
-```
-
-Она открывает новое окно Firefox с поиском Google по переданному запросу.
-
-## DSort.sh
-
-`DSort.sh` сортирует содержимое `~/Downloads` по папкам в домашней директории:
-
-- аудио -> `~/Audios`;
-- изображения -> `~/Pictures`;
-- видео -> `~/Videos`;
-- код и скрипты -> `~/Code`;
-- всё остальное -> `~/Docs`.
-
-При первом запуске скрипт создаёт папки `Downloads`, `Audios`, `Docs`, `Pictures`, `Videos`, `Code` и файл-флаг `~/.dirs-exists-flag`.
-
-## Лицензия
-
-См. [LICENSE](LICENSE).
+DFishC is distributed under the [GNU GPL v3.0 or later](LICENSE).

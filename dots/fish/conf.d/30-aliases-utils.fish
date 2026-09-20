@@ -1,6 +1,5 @@
 status is-interactive; or return
 
-alias nano='nano'
 alias na='nano'
 alias sna='sudo nano'
 alias snano='sna'
