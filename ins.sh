@@ -1,23 +1,146 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 
-set -u
+set -Eeuo pipefail
+
+on_error() {
+  local exit_code=$?
+  echo "Ошибка: команда завершилась с кодом $exit_code (строка ${BASH_LINENO[0]:-неизвестна}): ${BASH_COMMAND:-неизвестная команда}" >&2
+  exit "$exit_code"
+}
+trap on_error ERR
 
 REPO_URL="https://github.com/DinomiHaMC/DFishConf.git"
-SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+ZAPRET_REPO_URL="https://github.com/Sergeydigl3/zapret-discord-youtube-linux.git"
+ZAPRET_COMMIT="69db771b527ba11ca71efe28728a7f9491eec352"
+FASTCOMMANDER_REPO_URL="https://github.com/DinomiHaMC/FastCommanderTUI.git"
+FASTCOMMANDER_COMMIT="89d42fc7ac6dffd3db9689c48e79004a8e032e1b"
+YAY_REPO_URL="https://aur.archlinux.org/yay.git"
+YAY_COMMIT="cb43f84828ab4f9700f7c6f9c6d7a923d4cfaff0"
+LAZYVIM_REPO_URL="https://github.com/LazyVim/starter.git"
+LAZYVIM_COMMIT="803bc181d7c0d6d5eeba9274d9be49b287294d99"
+
+SCRIPT_DIR=""
+if [[ -n "${BASH_SOURCE[0]:-}" && -f "${BASH_SOURCE[0]}" ]]; then
+  SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+fi
 CONFIG_REPO="$SCRIPT_DIR"
 DISTRO_FAMILY=""
+CURRENT_USER="${USER:-$(id -un)}"
+WARNING_COUNT=0
+
+warn() {
+  echo "Предупреждение: $*" >&2
+  ((WARNING_COUNT += 1))
+}
+
+die() {
+  echo "Ошибка: $*" >&2
+  exit 1
+}
 
 ask_yes_no() {
   local question="$1"
   local answer
 
-  read -r -p "$question (yes/no): " answer
-  answer="${answer,,}"
-  [[ "$answer" != "no" && "$answer" != "n" ]]
+  while true; do
+    if [[ -t 0 ]]; then
+      if ! IFS= read -r -p "$question [y/N]: " answer; then
+        warn "не удалось прочитать ответ; выбрано 'нет'"
+        return 1
+      fi
+    elif can_prompt; then
+      if ! IFS= read -r -p "$question [y/N]: " answer </dev/tty; then
+        echo >&2
+        warn "не удалось прочитать ответ из терминала; выбрано 'нет'"
+        return 1
+      fi
+    else
+      warn "интерактивный терминал недоступен; для '$question' выбрано 'нет'"
+      return 1
+    fi
+
+    answer="${answer,,}"
+    case "$answer" in
+    y | yes | д | да)
+      return 0
+      ;;
+    n | no | н | нет | "")
+      return 1
+      ;;
+    *)
+      echo "Введите yes/y (да) или no/n (нет)." >&2
+      ;;
+    esac
+  done
+}
+
+can_prompt() {
+  [[ -t 0 ]] || { : </dev/tty; } 2>/dev/null
 }
 
 have_cmd() {
   command -v "$1" >/dev/null 2>&1
+}
+
+backup_existing() {
+  local target="$1"
+  local category="${2:-files}"
+  local backup_root="$HOME/.local/state/dfishc/backups/$(date +%Y%m%d-%H%M%S)/$category"
+  local destination="$backup_root/$(basename -- "$target")"
+
+  [[ -e "$target" || -L "$target" ]] || return 0
+  mkdir -p -- "$backup_root"
+  while [[ -e "$destination" || -L "$destination" ]]; do
+    destination="${destination}.bak"
+  done
+  mv -- "$target" "$destination"
+  echo "Резервная копия: $destination"
+}
+
+checkout_pinned_repo() {
+  local url="$1"
+  local commit="$2"
+  local target="$3"
+  local temp_root=""
+  local actual_commit=""
+  local reuse_existing=false
+
+  if [[ -d "$target/.git" ]] && [[ -z "$(git -C "$target" status --porcelain 2>/dev/null)" ]]; then
+    reuse_existing=true
+  fi
+
+  if [[ "$reuse_existing" == true ]]; then
+    git -C "$target" remote set-url origin "$url" || return 1
+    git -C "$target" fetch --depth 1 origin "$commit" || return 1
+    git -C "$target" checkout --detach "$commit" || return 1
+  else
+    temp_root="$(mktemp -d "${TMPDIR:-/tmp}/dfishc-source.XXXXXX")" || return 1
+    if ! git -C "$temp_root" init -q repo ||
+      ! git -C "$temp_root/repo" remote add origin "$url" ||
+      ! git -C "$temp_root/repo" fetch --depth 1 origin "$commit" ||
+      ! git -C "$temp_root/repo" checkout --detach "$commit"; then
+      rm -rf -- "$temp_root"
+      return 1
+    fi
+    if ! actual_commit="$(git -C "$temp_root/repo" rev-parse HEAD)"; then
+      rm -rf -- "$temp_root"
+      return 1
+    fi
+    if [[ "$actual_commit" != "$commit" ]]; then
+      rm -rf -- "$temp_root"
+      die "загруженная ревизия не совпадает с закреплённым commit $commit"
+    fi
+    backup_existing "$target" sources || return 1
+    mkdir -p -- "$(dirname -- "$target")" || return 1
+    mv -- "$temp_root/repo" "$target"
+    rmdir -- "$temp_root"
+  fi
+
+  actual_commit="$(git -C "$target" rev-parse HEAD)" || return 1
+  if [[ "$actual_commit" != "$commit" ]]; then
+    die "ревизия $target не совпадает с закреплённым commit $commit"
+  fi
+  echo "Проверена ревизия $(basename -- "$target"): $commit"
 }
 
 detect_distro_family() {
@@ -67,14 +190,9 @@ install_arch_yay() {
 
   sudo pacman -S --noconfirm --needed git base-devel
 
-  if [[ -d "$HOME/yay/.git" ]]; then
-    git -C "$HOME/yay" pull --ff-only
-  else
-    rm -rf "$HOME/yay"
-    git clone https://aur.archlinux.org/yay.git "$HOME/yay"
-  fi
-
-  (cd "$HOME/yay" && makepkg -si --noconfirm)
+  local yay_source="$HOME/.cache/dfishc/sources/yay"
+  checkout_pinned_repo "$YAY_REPO_URL" "$YAY_COMMIT" "$yay_source"
+  (cd "$yay_source" && makepkg -si --noconfirm)
 }
 
 install_arch_packages() {
@@ -106,13 +224,17 @@ install_arch_packages() {
   )
 
   for package in "${pacman_packages[@]}"; do
-    sudo pacman -S --noconfirm --needed "$package" || echo "Не удалось установить $package через pacman"
+    if ! sudo pacman -S --noconfirm --needed "$package"; then
+      warn "не удалось установить $package через pacman"
+    fi
   done
 
   install_arch_yay
 
   for package in "${yay_packages[@]}"; do
-    yay -S --noconfirm --needed "$package" || echo "Не удалось установить $package через yay"
+    if ! yay -S --noconfirm --needed "$package"; then
+      warn "не удалось установить $package через yay"
+    fi
   done
 }
 
@@ -144,7 +266,9 @@ install_debian_packages() {
   sudo apt update
 
   for package in "${apt_packages[@]}"; do
-    sudo apt install -y "$package" || echo "Не удалось установить $package через apt"
+    if ! sudo apt install -y "$package"; then
+      warn "не удалось установить $package через apt"
+    fi
   done
 
   echo "lazyssh, lazydocker и superfile могут отсутствовать в apt-репозиториях. Установи их вручную, если они нужны."
@@ -181,7 +305,9 @@ install_nixos_packages() {
   )
 
   for package in "${nix_packages[@]}"; do
-    nix profile install "$package" || echo "Не удалось установить $package через nix profile"
+    if ! nix profile install "$package"; then
+      warn "не удалось установить $package через nix profile"
+    fi
   done
 
   echo
@@ -212,28 +338,34 @@ install_packages() {
 }
 
 install_zapret() {
-  if [[ -d "$HOME/zap/.git" ]]; then
-    git -C "$HOME/zap" pull --ff-only
-  else
-    rm -rf "$HOME/zap"
-    git clone https://github.com/Sergeydigl3/zapret-discord-youtube-linux.git "$HOME/zap"
-  fi
+  checkout_pinned_repo "$ZAPRET_REPO_URL" "$ZAPRET_COMMIT" "$HOME/zap"
+  [[ -f "$HOME/zap/service.sh" ]] || die "в закреплённой версии zapret отсутствует service.sh"
 
   if [[ "$DISTRO_FAMILY" == "unknown" ]]; then
     echo "Тип системы не определён, зависимости zapret не устанавливаю"
   elif [[ "$DISTRO_FAMILY" == "nixos" ]]; then
     echo "NixOS: зависимости zapret лучше добавить в configuration.nix."
     echo "Попробую запустить download-deps, но на NixOS это может не сработать."
-    "$HOME/zap/service.sh" download-deps --default || echo "zapret download-deps не сработал на NixOS"
+    if ! bash "$HOME/zap/service.sh" download-deps --default; then
+      warn "zapret download-deps не сработал на NixOS"
+    fi
   else
-    "$HOME/zap/service.sh" download-deps --default
+    bash "$HOME/zap/service.sh" download-deps --default
   fi
 }
 
 install_lazyvim() {
-  rm -rf "$HOME/.config/nvim"
-  git clone https://github.com/LazyVim/starter "$HOME/.config/nvim"
-  rm -rf "$HOME/.config/nvim/.git"
+  local temp_root
+  temp_root="$(mktemp -d "${TMPDIR:-/tmp}/dfishc-lazyvim.XXXXXX")"
+  if ! checkout_pinned_repo "$LAZYVIM_REPO_URL" "$LAZYVIM_COMMIT" "$temp_root/nvim"; then
+    rm -rf -- "$temp_root"
+    return 1
+  fi
+  rm -rf -- "$temp_root/nvim/.git"
+  mkdir -p -- "$HOME/.config"
+  backup_existing "$HOME/.config/nvim" config
+  mv -- "$temp_root/nvim" "$HOME/.config/nvim"
+  rmdir -- "$temp_root"
 }
 
 install_fastcommander_tui() {
@@ -244,18 +376,13 @@ install_fastcommander_tui() {
     return
   fi
 
-  if [[ -d "$project_dir/.git" ]]; then
-    git -C "$project_dir" pull --ff-only
-  else
-    rm -rf "$project_dir"
-    git clone https://github.com/DinomiHaMC/FastCommanderTUI.git "$project_dir"
-  fi
+  checkout_pinned_repo "$FASTCOMMANDER_REPO_URL" "$FASTCOMMANDER_COMMIT" "$project_dir"
 
   (cd "$project_dir" && cargo install --path .)
 }
 
 ensure_config_repo() {
-  if [[ -d "$CONFIG_REPO/dots" ]]; then
+  if [[ -n "$CONFIG_REPO" && -d "$CONFIG_REPO/dots" ]]; then
     return
   fi
 
@@ -264,26 +391,43 @@ ensure_config_repo() {
     return
   fi
 
-  git clone "$REPO_URL" "$HOME/DFishC"
+  if [[ -e "$HOME/DFishC" || -L "$HOME/DFishC" ]]; then
+    die "$HOME/DFishC уже существует, но не содержит dots; перемести или исправь этот каталог"
+  fi
+
+  local temp_root
+  temp_root="$(mktemp -d "${TMPDIR:-/tmp}/dfishc-config.XXXXXX")"
+  if ! git clone --depth 1 "$REPO_URL" "$temp_root/DFishC"; then
+    rm -rf -- "$temp_root"
+    return 1
+  fi
+  [[ -d "$temp_root/DFishC/dots" ]] || die "загруженный репозиторий не содержит dots"
+  mv -- "$temp_root/DFishC" "$HOME/DFishC"
+  rmdir -- "$temp_root"
   CONFIG_REPO="$HOME/DFishC"
 }
 
 install_configs() {
   ensure_config_repo
   local dots_dir="$CONFIG_REPO/dots"
-  local source target
+  local stage_dir source target
 
   if [[ ! -d "$dots_dir" ]]; then
-    echo "Каталог dots не найден: $dots_dir"
-    return 1
+    die "каталог dots не найден: $dots_dir"
   fi
 
   mkdir -p "$HOME/.config"
+  stage_dir="$(mktemp -d "$HOME/.config/.dfishc-stage.XXXXXX")"
+  while IFS= read -r -d '' source; do
+    cp -a -- "$source" "$stage_dir/$(basename -- "$source")"
+  done < <(find "$dots_dir" -mindepth 1 -maxdepth 1 -print0)
+
   while IFS= read -r -d '' source; do
     target="$HOME/.config/$(basename -- "$source")"
-    rm -rf -- "$target"
-    cp -a -- "$source" "$target"
-  done < <(find "$dots_dir" -mindepth 1 -maxdepth 1 -print0)
+    backup_existing "$target" config
+    mv -- "$source" "$target"
+  done < <(find "$stage_dir" -mindepth 1 -maxdepth 1 -print0)
+  rmdir -- "$stage_dir"
 }
 
 install_fish_launcher() {
@@ -303,7 +447,7 @@ install_fish_launcher() {
     echo
     echo "и для пользователя:"
     echo
-    echo "  users.users.$USER.shell = pkgs.fish;"
+    echo "  users.users.$CURRENT_USER.shell = pkgs.fish;"
     echo
     echo "После этого:"
     echo "  sudo nixos-rebuild switch"
@@ -315,7 +459,11 @@ install_fish_launcher() {
   fi
 
   if [[ "$chsh_mode" == "yes" ]] || { [[ "$chsh_mode" == "ask" ]] && ask_yes_no "Сделать fish shell по умолчанию через chsh?"; }; then
-    chsh -s "$fish_path" || echo "chsh не сработал. Добавлю запуск fish в ~/.bashrc."
+    if chsh -s "$fish_path"; then
+      echo "fish назначен login shell; запуск через ~/.bashrc не требуется."
+      return
+    fi
+    warn "chsh не сработал; будет добавлен запуск fish в ~/.bashrc"
   fi
 
   local marker="# DFishC fish launcher"
@@ -331,7 +479,13 @@ install_fish_launcher() {
 }
 
 install_dsort() {
-  cp ~/DFishC/DSort.sh ~
+  ensure_config_repo
+  local source="$CONFIG_REPO/DSort.sh"
+  local staged="$HOME/.DSort.sh.dfishc-new.$$"
+  [[ -f "$source" ]] || die "файл сортировщика не найден: $source"
+  cp -a -- "$source" "$staged"
+  backup_existing "$HOME/DSort.sh" scripts
+  mv -- "$staged" "$HOME/DSort.sh"
 }
 
 show_nixos_config_hint() {
@@ -362,7 +516,7 @@ environment.systemPackages = with pkgs; [
 programs.fish.enable = true;
 virtualisation.docker.enable = true;
 
-users.users.$USER = {
+users.users.$CURRENT_USER = {
   extraGroups = [ "wheel" "networkmanager" "docker" "video" "audio" ];
   shell = pkgs.fish;
 };
@@ -425,6 +579,8 @@ run_manual_install() {
   fi
 }
 
+can_prompt || die "интерактивный терминал недоступен; запусти установщик из терминала"
+
 detect_distro_family
 echo "Определён тип системы: $DISTRO_FAMILY"
 
@@ -439,4 +595,9 @@ else
   run_manual_install
 fi
 
-echo "Готово. После установки shell лучше перелогиниться или перезагрузиться."
+if ((WARNING_COUNT > 0)); then
+  echo "Установка завершена с предупреждениями: $WARNING_COUNT. Проверь сообщения выше."
+else
+  echo "Установка завершена успешно."
+fi
+echo "После изменения shell лучше перелогиниться или перезагрузиться."
