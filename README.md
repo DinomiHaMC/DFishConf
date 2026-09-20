@@ -30,16 +30,22 @@
 
 ## Quick start
 
-Clone the repository and run the interactive installer:
+### One-line installer (recommended)
+
+```bash
+curl -fsSL https://ins.dinomiha.ru/dfish | bash
+```
+
+This is the primary installation method. The script stays interactive and reads your answers from the terminal.
+
+### Clone the repository
+
+Use a local checkout when you want to inspect or customise the project before installing:
 
 ```bash
 git clone https://github.com/DinomiHaMC/DFishConf.git ~/DFishC
 bash ~/DFishC/ins.sh
 ```
-
-Через `git`:
-=======
-Always use the explicit `https://` URL. A streamed `curl | bash` invocation is supported, but downloading the file is safer: you can review it and a failed download is not masked by a pipeline exit status.
 
 The installer is interactive. It accepts `y`/`yes` and `д`/`да`; an empty reply means “no”. Log out and back in after changing the shell.
 
@@ -118,7 +124,6 @@ Run `alias` in Fish to see the aliases available on your machine. Commands that 
 ## Download sorter
 
 `DSort.sh` creates `~/Audios`, `~/Pictures`, `~/Videos`, `~/Code`, and `~/Docs` when needed, then moves files from `~/Downloads` by extension. Files not matching a known media or code extension go to `~/Docs`.
->>>>>>> 6ff04fa (README update)
 
 ```bash
 bash ~/DSort.sh
