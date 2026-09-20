@@ -29,28 +29,6 @@ git clone https://github.com/DinomiHaMC/DFishConf.git ~/DFishC
 bash ~/DFishC/ins.sh
 ```
 
-<<<<<<< HEAD
-## Установка
-
-Одной командой: 
-```bash
-curl -fsSL https://ins.dinomiha.ru/dfish | bash
-```
-
-Через `curl` (рекомендуемый вариант — сначала скачать и проверить файл):
-=======
-Or download the installer first, inspect it, then execute it:
->>>>>>> 6ff04fa (README update)
-
-```bash
-curl -fsSL https://ins.dinomiha.ru/dfish -o dfishc-ins.sh
-bash -n dfishc-ins.sh
-less dfishc-ins.sh
-bash dfishc-ins.sh
-rm dfishc-ins.sh
-```
-
-<<<<<<< HEAD
 Через `git`:
 =======
 Always use the explicit `https://` URL. A streamed `curl | bash` invocation is supported, but downloading the file is safer: you can review it and a failed download is not masked by a pipeline exit status.
