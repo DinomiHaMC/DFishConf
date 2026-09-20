@@ -5,6 +5,14 @@
 </p>
 
 <p align="center">
+  <img src="https://ins.dinomiha.ru/fetch.png" alt="Сводка системы DFishC" width="720">
+</p>
+
+<p align="center">
+  <img src="https://ins.dinomiha.ru/Command-line.png" alt="Командная строка DFishC" width="383">
+</p>
+
+<p align="center">
   <a href="README.md">English</a> ·
   <a href="#быстрый-старт">Быстрый старт</a> ·
   <a href="#состав-проекта">Состав</a> ·

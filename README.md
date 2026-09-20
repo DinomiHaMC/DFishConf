@@ -5,6 +5,14 @@
 </p>
 
 <p align="center">
+  <img src="https://ins.dinomiha.ru/fetch.png" alt="DFishC system summary" width="720">
+</p>
+
+<p align="center">
+  <img src="https://ins.dinomiha.ru/Command-line.png" alt="DFishC command line" width="383">
+</p>
+
+<p align="center">
   <a href="README.ru.md">Русский</a> ·
   <a href="#quick-start">Quick start</a> ·
   <a href="#what-is-included">What is included</a> ·
